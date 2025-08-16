@@ -1,0 +1,617 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ecf0f1;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Game container */
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header styles */
+.game-header {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-bottom: 2px solid #3498db;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.stat {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px 25px;
+    border-radius: 10px;
+    border: 1px solid #3498db;
+}
+
+.stat-label {
+    display: block;
+    font-size: 14px;
+    color: #bdc3c7;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    color: #f39c12;
+}
+
+/* Main game area */
+.game-main {
+    flex: 1;
+    display: flex;
+    gap: 30px;
+    padding: 30px;
+}
+
+/* Character area */
+.character-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+.beggar-container {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    min-height: 300px;
+}
+
+/* Beggar character */
+.beggar {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.beggar:hover {
+    transform: scale(1.05);
+}
+
+.beggar:active {
+    transform: scale(0.95);
+}
+
+.beggar-head {
+    width: 60px;
+    height: 60px;
+    background: #f4c2a1;
+    border-radius: 50%;
+    position: relative;
+    margin: 0 auto 5px;
+    border: 2px solid #d4a574;
+}
+
+.beggar-head::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #2c3e50;
+    border-radius: 50%;
+    top: 20px;
+    left: 15px;
+}
+
+.beggar-head::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #2c3e50;
+    border-radius: 50%;
+    top: 20px;
+    right: 15px;
+}
+
+.beggar-hat {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 30px;
+    background: #8b4513;
+    border-radius: 15px 15px 5px 5px;
+    border: 2px solid #654321;
+}
+
+.beggar-body {
+    width: 80px;
+    height: 120px;
+    background: #7f8c8d;
+    border-radius: 10px;
+    margin: 0 auto;
+    border: 2px solid #5d6d6e;
+    position: relative;
+}
+
+.beggar-body::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 60px;
+    background: #95a5a6;
+    top: 20px;
+    left: 10px;
+    border-radius: 5px;
+}
+
+.beggar-body::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 60px;
+    background: #95a5a6;
+    top: 20px;
+    right: 10px;
+    border-radius: 5px;
+}
+
+.beggar-arms {
+    position: absolute;
+    top: 80px;
+    width: 100%;
+}
+
+.arm {
+    position: absolute;
+    width: 15px;
+    height: 50px;
+    background: #f4c2a1;
+    border-radius: 8px;
+    border: 1px solid #d4a574;
+}
+
+.arm.left {
+    left: -20px;
+    transform: rotate(-20deg);
+}
+
+.arm.right {
+    right: -20px;
+    transform: rotate(20deg);
+}
+
+.beggar-legs {
+    position: relative;
+    margin-top: 5px;
+    display: flex;
+    justify-content: space-between;
+    width: 60px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.leg {
+    width: 20px;
+    height: 60px;
+    background: #34495e;
+    border-radius: 10px;
+    border: 1px solid #2c3e50;
+}
+
+/* Dog character */
+.dog {
+    position: relative;
+    animation: dogWag 2s infinite ease-in-out;
+}
+
+@keyframes dogWag {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+}
+
+.dog-head {
+    width: 40px;
+    height: 35px;
+    background: #8b4513;
+    border-radius: 50% 50% 40% 40%;
+    position: relative;
+    margin: 0 auto 5px;
+    border: 2px solid #654321;
+}
+
+.dog-ear {
+    position: absolute;
+    width: 15px;
+    height: 20px;
+    background: #654321;
+    border-radius: 50%;
+    top: -5px;
+}
+
+.dog-ear.left { left: 5px; }
+.dog-ear.right { right: 5px; }
+
+.dog-eyes {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+}
+
+.eye {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #2c3e50;
+    border-radius: 50%;
+}
+
+.eye.left { left: 10px; }
+.eye.right { right: 10px; }
+
+.dog-nose {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 4px;
+    background: #2c3e50;
+    border-radius: 50%;
+}
+
+.dog-body {
+    width: 50px;
+    height: 30px;
+    background: #8b4513;
+    border-radius: 15px;
+    margin: 0 auto;
+    border: 2px solid #654321;
+}
+
+.dog-legs {
+    display: flex;
+    justify-content: space-between;
+    width: 45px;
+    margin: 5px auto 0;
+}
+
+.dog-leg {
+    width: 8px;
+    height: 15px;
+    background: #654321;
+    border-radius: 4px;
+}
+
+.dog-tail {
+    position: absolute;
+    right: -15px;
+    top: 30px;
+    width: 20px;
+    height: 8px;
+    background: #8b4513;
+    border-radius: 10px;
+    border: 1px solid #654321;
+    animation: tailWag 1s infinite ease-in-out;
+    transform-origin: left center;
+}
+
+@keyframes tailWag {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+}
+
+/* Collection area */
+.collection-area {
+    text-align: center;
+}
+
+.beg-button {
+    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 20px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.beg-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(45deg, #ec7063, #e74c3c);
+}
+
+.beg-button:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Money particles */
+.money-particles {
+    position: relative;
+    height: 100px;
+    overflow: hidden;
+}
+
+.money-particle {
+    position: absolute;
+    font-size: 24px;
+    color: #f39c12;
+    font-weight: bold;
+    pointer-events: none;
+    animation: floatUp 2s ease-out forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(1.5);
+    }
+}
+
+/* Upgrades panel */
+.upgrades-panel {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    padding: 25px;
+    border: 2px solid #3498db;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.upgrades-panel h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #3498db;
+    font-size: 24px;
+}
+
+.upgrade-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.upgrade {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #34495e;
+    transition: all 0.3s ease;
+}
+
+.upgrade:hover {
+    border-color: #3498db;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.upgrade.purchased {
+    background: rgba(46, 204, 113, 0.2);
+    border-color: #2ecc71;
+}
+
+.upgrade-info h4 {
+    color: #ecf0f1;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.upgrade-info p {
+    color: #bdc3c7;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.upgrade-effect {
+    color: #f39c12;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.upgrade-cost {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.upgrade-cost span {
+    font-size: 18px;
+    font-weight: bold;
+    color: #f39c12;
+}
+
+.buy-button {
+    background: linear-gradient(45deg, #27ae60, #2ecc71);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.buy-button:hover {
+    background: linear-gradient(45deg, #2ecc71, #58d68d);
+    transform: translateY(-2px);
+}
+
+.buy-button:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Footer */
+.game-footer {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #3498db;
+}
+
+.control-button {
+    background: linear-gradient(45deg, #8e44ad, #9b59b6);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.control-button:hover {
+    background: linear-gradient(45deg, #9b59b6, #bb8fce);
+    transform: translateY(-2px);
+}
+
+.game-info {
+    color: #bdc3c7;
+    font-size: 14px;
+}
+
+/* Floating money animation */
+.floating-money {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.floating-coin {
+    position: absolute;
+    font-size: 20px;
+    color: #f39c12;
+    animation: floatAway 3s ease-out forwards;
+}
+
+@keyframes floatAway {
+    0% {
+        opacity: 1;
+        transform: translateY(0px) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-200px) rotate(360deg);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .game-main {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .stat {
+        padding: 10px 15px;
+    }
+    
+    .beggar-container {
+        min-height: 200px;
+    }
+    
+    .upgrades-panel {
+        max-height: none;
+    }
+    
+    .game-footer {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-main {
+        padding: 15px;
+    }
+    
+    .game-header {
+        padding: 15px;
+    }
+    
+    .beg-button {
+        padding: 15px 30px;
+        font-size: 16px;
+    }
+    
+    .upgrade {
+        padding: 15px;
+    }
+    
+    .upgrade-cost {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Animation classes */
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.pulse {
+    animation: pulse 0.6s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.bounce {
+    animation: bounce 0.8s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
