@@ -1,0 +1,191 @@
+/* 기본 & 레이아웃 */
+body {
+    font-family: 'Malgun Gothic', sans-serif;
+    background-color: #e9eef2; /* 약간 더 부드러운 배경색 */
+    color: #333;
+    font-size: 14px; /* 기본 폰트 크기 줄임 */
+}
+
+#game-container {
+    width: 100%;
+    max-width: 960px; /* 데스크톱에 맞는 넓은 컨테이너 */
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 24px;
+    margin: 20px auto;
+}
+
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+#main-layout {
+    display: flex;
+    gap: 24px; /* 컬럼 사이의 간격 */
+}
+
+#left-column {
+    flex: 1;
+}
+
+#right-column {
+    flex: 2; /* 오른쪽 컬럼을 더 넓게 */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+h1, h2, h3 {
+    margin: 0;
+    color: #2c3e50;
+}
+h1 { font-size: 24px; }
+h2 { font-size: 20px; }
+h3 {
+    text-align: left;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+/* 섹션별 스타일 */
+#info-section, #status-section, #upgrade-section, #companion-section {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+#info-section {
+    text-align: center;
+}
+
+#status-section {
+    margin-top: 20px;
+}
+#status-section p {
+    margin: 8px 0;
+    text-align: center;
+}
+
+/* 캐릭터 및 이미지 */
+.character-box {
+    text-align: center;
+}
+.character-box img {
+    width: 120px; /* 이미지 크기 조정 */
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #ced4da;
+    margin-bottom: 8px;
+}
+.character-box.small img {
+    width: 80px;
+    height: 80px;
+    border-width: 3px;
+}
+
+/* 재화 정보 */
+.money-box span {
+    color: #1a73e8;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.cooldown-text {
+    color: #e74c3c;
+    font-size: 12px;
+    height: 1.2em;
+}
+
+/* 업그레이드 아이템 */
+.upgrade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+}
+.upgrade-item span {
+    font-weight: 500;
+}
+.upgrade-details {
+    text-align: right;
+}
+.upgrade-details small {
+    color: #6c757d;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* 동료 */
+#has-companion {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.companion-status {
+    flex: 1;
+}
+
+/* 버튼 및 입력 요소 */
+button {
+    padding: 6px 12px; /* 버튼 크기 줄임 */
+    font-size: 13px;
+    border: 1px solid #3498db;
+    background-color: #3498db;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+#acquire-companion {
+    width: 100%;
+    padding: 10px;
+    background-color: #2ecc71;
+    border: 1px solid #2ecc71;
+}
+#acquire-companion:hover {
+    background-color: #27ae60;
+}
+
+input[type="text"] {
+    display: block;
+    width: 80%;
+    margin: 5px auto;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.image-upload-label {
+    display: inline-block;
+    padding: 4px 8px;
+    background-color: #f39c12;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 5px;
+    border: 1px solid #f39c12;
+}
+.image-upload-label:hover {
+    background-color: #e67e22;
+}
