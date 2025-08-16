@@ -3,26 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. 게임 상태 변수
     const state = {
         money: 0,
-        // 메인 캐릭터 자동수익
-        autoIncome: {
-            amount: 1,
-            interval: 10000, // 10초 (밀리초 단위)
-        },
-        // 메인 캐릭터 수동수익
-        manualIncome: {
-            amount: 1,
-            canEarn: true,
-        },
-        // 동료
+        autoIncome: { amount: 1, interval: 10000 },
+        manualIncome: { amount: 1, canEarn: true },
         companion: {
             acquired: false,
             name: "멍멍이",
-            autoIncome: {
-                amount: 1,
-                interval: 20000, // 20초
-            }
+            autoIncome: { amount: 1, interval: 20000 }
         },
-        // 업그레이드 비용
         costs: {
             autoTime: 10,
             autoAmount: 50,
@@ -35,11 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. DOM 요소 가져오기
     const moneyDisplay = document.getElementById('money-display');
+    const beggarImage = document.getElementById('beggar-image'); // 거지 이미지
     const autoIncomeIntervalDisplay = document.getElementById('auto-income-interval-display');
     const autoIncomeAmountDisplay = document.getElementById('auto-income-amount-display');
     const manualIncomeAmountDisplay = document.getElementById('manual-income-amount-display');
-    const manualCooldownDisplay = document.getElementById('manual-income-cooldown');
+    const manualIncomeStatusIcon = document.getElementById('manual-income-status-icon'); // 상태 아이콘
     
+    // ... (나머지 DOM 요소는 동일)
     const costAutoTime = document.getElementById('cost-auto-time');
     const currentAutoTime = document.getElementById('current-auto-time');
     const costAutoAmount = document.getElementById('cost-auto-amount');
@@ -71,6 +60,15 @@ document.addEventListener('DOMContentLoaded', () => {
         autoIncomeIntervalDisplay.textContent = (state.autoIncome.interval / 1000).toFixed(2);
         autoIncomeAmountDisplay.textContent = state.autoIncome.amount;
         manualIncomeAmountDisplay.textContent = state.manualIncome.amount;
+        
+        // 수동수익 상태 아이콘 업데이트
+        if (state.manualIncome.canEarn) {
+            manualIncomeStatusIcon.classList.remove('cooldown');
+            manualIncomeStatusIcon.classList.add('ready');
+        } else {
+            manualIncomeStatusIcon.classList.remove('ready');
+            manualIncomeStatusIcon.classList.add('cooldown');
+        }
 
         costAutoTime.textContent = state.costs.autoTime;
         currentAutoTime.textContent = (state.autoIncome.interval / 1000).toFixed(2);
@@ -93,7 +91,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 4. 자동 수익 설정 함수
+    // 4. 수동 수익 획득 및 쿨타임 처리 함수
+    function handleManualIncome() {
+        if (state.manualIncome.canEarn) {
+            state.money += state.manualIncome.amount;
+            state.manualIncome.canEarn = false;
+            updateUI(); // 즉시 UI 업데이트하여 아이콘 색 변경
+            
+            setTimeout(() => {
+                state.manualIncome.canEarn = true;
+                updateUI(); // 쿨타임 종료 후 다시 UI 업데이트
+            }, 3000); // 쿨타임을 3초로 변경
+        }
+    }
+
+    // 5. 자동 수익 설정 함수
     function setupAutoIncome() {
         if(mainAutoIncomeInterval) clearInterval(mainAutoIncomeInterval);
         mainAutoIncomeInterval = setInterval(() => {
@@ -112,30 +124,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 5. 이벤트 리스너 (버튼 클릭, 키보드 입력 등)
+    // 6. 이벤트 리스너
     function addEventListeners() {
         // 방향키로 수동 수익
         document.addEventListener('keydown', (e) => {
-            if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                if(state.manualIncome.canEarn) {
-                    state.money += state.manualIncome.amount;
-                    state.manualIncome.canEarn = false;
-                    manualCooldownDisplay.textContent = '1초 후 다시 가능합니다.';
-                    updateUI();
-                    setTimeout(() => {
-                        state.manualIncome.canEarn = true;
-                        manualCooldownDisplay.textContent = '';
-                    }, 1000);
-                }
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                handleManualIncome();
             }
+        });
+        
+        // 이미지 클릭으로 수동 수익
+        beggarImage.addEventListener('click', () => {
+            handleManualIncome();
         });
 
         // 업그레이드: 자동수익 시간
         document.getElementById('upgrade-auto-time').addEventListener('click', () => {
             if (state.money >= state.costs.autoTime && state.autoIncome.interval > 5000) {
                 state.money -= state.costs.autoTime;
-                state.autoIncome.interval -= 10; // 0.01초 감소
-                state.costs.autoTime = Math.floor(state.costs.autoTime * 1.05); // 비용 5% 증가
+                state.autoIncome.interval -= 10;
+                state.costs.autoTime = Math.floor(state.costs.autoTime * 1.05);
                 setupAutoIncome();
                 updateUI();
             }
@@ -146,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (state.money >= state.costs.autoAmount) {
                 state.money -= state.costs.autoAmount;
                 state.autoIncome.amount += 1;
-                state.costs.autoAmount = Math.floor(state.costs.autoAmount * 1.15); // 비용 15% 증가
+                state.costs.autoAmount = Math.floor(state.costs.autoAmount * 1.15);
                 updateUI();
             }
         });
@@ -156,12 +164,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (state.money >= state.costs.manualAmount) {
                 state.money -= state.costs.manualAmount;
                 state.manualIncome.amount += 1;
-                state.costs.manualAmount = Math.floor(state.costs.manualAmount * 1.2); // 비용 20% 증가
+                state.costs.manualAmount = Math.floor(state.costs.manualAmount * 1.2);
                 updateUI();
             }
         });
-
-        // 동료 영입
+        
+        // ... (동료 관련 이벤트 리스너는 동일)
         companionSection.acquireBtn.addEventListener('click', () => {
             if (state.money >= state.costs.acquireCompanion && !state.companion.acquired) {
                 state.money -= state.costs.acquireCompanion;
@@ -171,9 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // 동료 업그레이드: 시간
         document.getElementById('upgrade-companion-time').addEventListener('click', () => {
-             if (state.money >= state.costs.companionTime && state.companion.autoIncome.interval > 10000) { // 최소 10초
+             if (state.money >= state.costs.companionTime && state.companion.autoIncome.interval > 10000) {
                 state.money -= state.costs.companionTime;
                 state.companion.autoIncome.interval -= 10;
                 state.costs.companionTime = Math.floor(state.costs.companionTime * 1.05);
@@ -182,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 동료 업그레이드: 금액
         document.getElementById('upgrade-companion-amount').addEventListener('click', () => {
              if (state.money >= state.costs.companionAmount) {
                 state.money -= state.costs.companionAmount;
@@ -192,12 +198,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 동료 이름 변경
         companionSection.nameInput.addEventListener('change', () => {
             state.companion.name = companionSection.nameInput.value;
         });
         
-        // 동료 이미지 변경
         companionSection.imageUpload.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -210,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. 게임 초기화
+    // 7. 게임 초기화
     function init() {
         updateUI();
         setupAutoIncome();
