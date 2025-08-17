@@ -19,12 +19,15 @@
                 <div id="left-column">
                     <div id="info-section">
                         <div class="character-box">
-                            <img
-                                src="images/beggar.png"
-                                id="beggar-image"
-                                alt="거지"
-                            />
+                            <img src="images/beggar.png" id="beggar-image" alt="거지" />
                             <p>LV. <span id="beggar-level">1</span> 거지</p>
+                            <div class="exp-bar-container">
+                                <div id="exp-bar-fill"></div>
+                            </div>
+                            <p class="exp-text">
+                                <span id="current-exp-display">0</span> / 
+                                <span id="next-level-exp-display">...</span> EXP
+                            </p>
                         </div>
                     </div>
                     <div id="status-section">
@@ -127,18 +130,11 @@
                                         >1</span
                                     >원
                                 </p>
-                                <div class="upgrade-item">
-                                    <span>동료 속도 향상 (-0.01초)</span>
+                                <div class="upgrade-item" id="upgrade-companion-time-item">
+                                    <span>동료 속도 향상 (-1.00초)</span>
                                     <div class="upgrade-details">
-                                        <small
-                                            >비용:
-                                            <span id="cost-companion-time"
-                                                >500</span
-                                            >원</small
-                                        >
-                                        <button id="upgrade-companion-time">
-                                            구매
-                                        </button>
+                                        <small>비용: <span id="cost-companion-time">500</span>원</small>
+                                        <button id="upgrade-companion-time">구매</button>
                                     </div>
                                 </div>
                                 <div class="upgrade-item">
