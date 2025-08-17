@@ -1,36 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. 게임 상태 변수 (레벨 시스템 추가)
-    const state = {
-        money: 0,
-        level: 1, // 캐릭터 레벨
-        totalMoneyEarned: 0, // 총 번 돈 (경험치)
-        expForNextLevel: 0, // 다음 레벨에 필요한 총 경험치
-        autoIncome: { amount: 1, interval: 10000 },
-        manualIncome: { amount: 1, canEarn: true },
-        companion: {
-            acquired: false, name: "멍멍이",
-            autoIncome: { amount: 1, interval: 20000 }
-        },
-        costs: {
-            autoTime: 10, autoAmount: 50, manualAmount: 20,
-            acquireCompanion: 1000, companionTime: 500, companionAmount: 1000,
-        },
-        levels: {
-            autoTime: 0, autoAmount: 1, manualAmount: 1,
-            companionTime: 0, companionAmount: 1,
-        }
-    };
-
-    // 2. DOM 요소 가져오기 (레벨 관련 요소 추가)
+    // --- DOM 요소 ---
+    const startScreen = document.getElementById('start-screen');
+    const newGameBtn = document.getElementById('new-game-btn');
+    const loadGameBtn = document.getElementById('load-game-btn');
+    const loadFileInput = document.getElementById('load-file-input');
+    const gameContainer = document.getElementById('game-container');
+    const saveGameBtn = document.getElementById('save-game-btn');
+    // (이하 기존 요소들)
     const moneyDisplay = document.getElementById('money-display');
     const beggarImage = document.getElementById('beggar-image');
+    // ... (나머지 모든 getElementById는 그대로 둡니다)
     const beggarLevelDisplay = document.getElementById('beggar-level');
     const expBarFill = document.getElementById('exp-bar-fill');
     const currentExpDisplay = document.getElementById('current-exp-display');
     const nextLevelExpDisplay = document.getElementById('next-level-exp-display');
-
-    // (이하 기존 DOM 요소들...)
+    const companionsContainer = document.getElementById('companions-container');
     const autoIncomeIntervalDisplay = document.getElementById('auto-income-interval-display');
     const autoIncomeAmountDisplay = document.getElementById('auto-income-amount-display');
     const manualIncomeAmountDisplay = document.getElementById('manual-income-amount-display');
@@ -41,226 +26,270 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentAutoAmount = document.getElementById('current-auto-amount');
     const costManualAmount = document.getElementById('cost-manual-amount');
     const currentManualAmount = document.getElementById('current-manual-amount');
-    const companionSection = {
-        noCompanion: document.getElementById('no-companion'), hasCompanion: document.getElementById('has-companion'),
-        acquireBtn: document.getElementById('acquire-companion'), image: document.getElementById('companion-image'),
-        nameInput: document.getElementById('companion-name-input'), imageUpload: document.getElementById('companion-image-upload'),
-        intervalDisplay: document.getElementById('companion-income-interval-display'),
-        amountDisplay: document.getElementById('companion-income-amount-display'), costTime: document.getElementById('cost-companion-time'),
-        costAmount: document.getElementById('cost-companion-amount'),
-        upgradeCompanionTimeBtn: document.getElementById('upgrade-companion-time'),
-        companionTimeUpgradeSpan: document.querySelector('#upgrade-companion-time-item span'),
-    };
+    const companionTotalIncomeDisplay = document.getElementById('companion-total-income-display');
 
-    let mainAutoIncomeInterval;
-    let companionAutoIncomeInterval;
+    let state = {}; // 게임 상태를 담을 변수
+    let autoIncomeIntervals = [];
 
-    // 3. 레벨 및 경험치 관련 함수
-    // 다음 레벨에 필요한 '총 누적 경험치'를 계산하는 핵심 함수
-    function calculateTotalExpForLevel(level) {
-        if (level <= 1) return 0;
+    // --- 게임 시작/종료 로직 ---
+    newGameBtn.addEventListener('click', () => {
+        const defaultState = { /* ... 기본 상태 객체 ... */ 
+            money: 0, level: 1, totalMoneyEarned: 0, expForNextLevel: 0,
+            autoIncome: { amount: 1, interval: 10000 },
+            manualIncome: { amount: 1, canEarn: true },
+            companions: [
+                { name: "강아지", acquired: false, cost: 1000, level: 1, autoIncome: { amount: 1, interval: 20000 }, costs: { time: 500, amount: 1200 }, levels: { time: 0, amount: 1 }, maxLevel: { time: 10, amount: 500 } },
+                { name: "고양이", acquired: false, cost: 30000, level: 1, autoIncome: { amount: 10, interval: 18000 }, costs: { time: 2500, amount: 6000 }, levels: { time: 0, amount: 1 }, maxLevel: { time: 10, amount: 400 } },
+                { name: "비둘기", acquired: false, cost: 800000, level: 1, autoIncome: { amount: 50, interval: 16000 }, costs: { time: 12500, amount: 30000 }, levels: { time: 0, amount: 1 }, maxLevel: { time: 10, amount: 350 } },
+                { name: "까치", acquired: false, cost: 40000000, level: 1, autoIncome: { amount: 250, interval: 14000 }, costs: { time: 62500, amount: 150000 }, levels: { time: 0, amount: 1 }, maxLevel: { time: 10, amount: 300 } },
+                { name: "인공지능", acquired: false, cost: 2500000000, level: 1, autoIncome: { amount: 1250, interval: 12000 }, costs: { time: 312500, amount: 750000 }, levels: { time: 0, amount: 1 }, maxLevel: { time: 10, amount: 250 } },
+                { name: "외계인", acquired: false, cost: 150000000000, level: 1, autoIncome: { amount: 6250, interval: 11000 }, costs: { time: 1562500, amount: 3750000 }, levels: { time: 0, amount: 1 }, maxLevel: { time: 10, amount: 200 } },
+                { name: "드래곤", acquired: false, cost: 8000000000000, level: 1, autoIncome: { amount: 31250, interval: 10000 }, costs: { time: 7812500, amount: 18750000 }, levels: { time: 0, amount: 1 }, maxLevel: { time: 10, amount: 200 } }
+            ],
+            costs: { autoTime: 10, autoAmount: 50, manualAmount: 20 },
+            levels: { autoTime: 0, autoAmount: 1, manualAmount: 1 },
+            maxLevels: { autoAmount: 1000, manualAmount: 1000 }
+        };
+        startGame(defaultState);
+    });
 
-        // Phase 1: 초반 (LV 1 ~ 400)
-        if (level <= 400) {
-            return Math.floor(100 * Math.pow(level - 1, 3.2));
-        }
+    loadGameBtn.addEventListener('click', () => {
+        loadFileInput.click(); // 숨겨진 파일 인풋을 클릭
+    });
 
-        const expAt400 = Math.floor(100 * Math.pow(399, 3.2));
-        // Phase 2: 중반 (LV 401 ~ 800)
-        if (level <= 800) {
-            return expAt400 + Math.floor(15000 * Math.pow(level - 400, 3.8));
-        }
+    loadFileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
-        // Phase 3: 후반 (LV 801 ~ )
-        const expAt800 = expAt400 + Math.floor(15000 * Math.pow(400, 3.8));
-        const lastIncrease = calculateTotalExpForLevel(800) - calculateTotalExpForLevel(799); // 증가량 고정
-        return expAt800 + (level - 800) * lastIncrease;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const loadedState = JSON.parse(e.target.result);
+                startGame(loadedState);
+            } catch (error) {
+                alert('잘못된 저장 파일입니다.');
+            }
+        };
+        reader.readAsText(file);
+    });
+
+    function startGame(initialState) {
+        state = initialState;
+        startScreen.style.display = 'none';
+        gameContainer.style.display = 'block';
+        init(); // 게임 로직 초기화
     }
 
-    function checkForLevelUp() {
+    // --- 저장 기능 ---
+    saveGameBtn.addEventListener('click', () => {
+        const dataStr = JSON.stringify(state);
+        const dataBlob = new Blob([dataStr], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(dataBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'beggar-save.txt'; // 기본 저장 파일 이름
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    });
+
+    // --- 이하 기존 게임 로직 ---
+    function formatNumber(num) { /* ... */ 
+        if (num < 1000) return Math.floor(num).toString();
+        const suffixes = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const exp = Math.floor(Math.log(num) / Math.log(1000));
+        const index = exp - 1;
+        if (index >= suffixes.length) return 'MAX';
+        const shortNum = (num / Math.pow(1000, exp));
+        return shortNum.toFixed(2).replace(/\.00$/, '') + suffixes[index];
+    }
+    function calculateTotalExpForLevel(level) { /* ... */ 
+        if (level <= 1) return 0;
+        if (level <= 400) return Math.floor(100 * Math.pow(level - 1, 3.2));
+        const expAt400 = Math.floor(100 * Math.pow(399, 3.2));
+        if (level <= 800) return expAt400 + Math.floor(15000 * Math.pow(level - 400, 3.8));
+        const expAt800 = expAt400 + Math.floor(15000 * Math.pow(400, 3.8));
+        const lastIncrease = calculateTotalExpForLevel(800) - calculateTotalExpForLevel(799);
+        return expAt800 + (level - 800) * lastIncrease;
+    }
+    function checkForLevelUp() { /* ... */ 
         while (state.totalMoneyEarned >= state.expForNextLevel) {
             state.level++;
             state.expForNextLevel = calculateTotalExpForLevel(state.level + 1);
         }
     }
-
-    // 돈을 버는 모든 곳에 경험치 획득 로직 추가
-    function earnMoney(amount) {
+    function earnMoney(amount) { /* ... */ 
         state.money += amount;
         state.totalMoneyEarned += amount;
-        checkForLevelUp(); // 돈 벌 때마다 레벨업 체크
+        checkForLevelUp();
         updateUI();
     }
-
-    // 4. UI 업데이트 함수 (레벨/경험치 표시 로직 추가)
-    function updateUI() {
-        moneyDisplay.textContent = Math.floor(state.money);
+    function updateUI() { /* ... */ 
+        moneyDisplay.textContent = formatNumber(state.money);
         beggarLevelDisplay.textContent = state.level;
-
-        // 경험치 바 및 텍스트 업데이트
         const expForPreviousLevel = calculateTotalExpForLevel(state.level);
         const currentLevelExp = state.totalMoneyEarned - expForPreviousLevel;
         const requiredExpForCurrentLevel = state.expForNextLevel - expForPreviousLevel;
-
-        currentExpDisplay.textContent = Math.floor(currentLevelExp).toLocaleString();
-        nextLevelExpDisplay.textContent = Math.floor(requiredExpForCurrentLevel).toLocaleString();
-
+        currentExpDisplay.textContent = formatNumber(currentLevelExp);
+        nextLevelExpDisplay.textContent = formatNumber(requiredExpForCurrentLevel);
         const expPercentage = (currentLevelExp / requiredExpForCurrentLevel) * 100;
         expBarFill.style.width = `${Math.min(100, expPercentage)}%`;
-
-        // (이하 기존 UI 업데이트 로직...)
         autoIncomeIntervalDisplay.textContent = (state.autoIncome.interval / 1000).toFixed(2);
-        autoIncomeAmountDisplay.textContent = state.autoIncome.amount;
-        manualIncomeAmountDisplay.textContent = state.manualIncome.amount;
-        if (state.manualIncome.canEarn) { manualIncomeStatusIcon.className = 'ready'; } 
-        else { manualIncomeStatusIcon.className = 'cooldown'; }
-        costAutoTime.textContent = state.costs.autoTime;
+        autoIncomeAmountDisplay.textContent = formatNumber(state.autoIncome.amount);
+        manualIncomeAmountDisplay.textContent = formatNumber(state.manualIncome.amount);
+        manualIncomeStatusIcon.className = state.manualIncome.canEarn ? 'ready' : 'cooldown';
+        costAutoTime.textContent = formatNumber(state.costs.autoTime);
         currentAutoTime.textContent = (state.autoIncome.interval / 1000).toFixed(2);
-        costAutoAmount.textContent = state.costs.autoAmount;
-        currentAutoAmount.textContent = state.autoIncome.amount;
-        costManualAmount.textContent = state.costs.manualAmount;
-        currentManualAmount.textContent = state.manualIncome.amount;
-        if (state.companion.acquired) {
-            companionSection.noCompanion.style.display = 'none';
-            companionSection.hasCompanion.style.display = 'flex';
-            companionSection.nameInput.value = state.companion.name;
-            companionSection.intervalDisplay.textContent = (state.companion.autoIncome.interval / 1000).toFixed(2);
-            companionSection.amountDisplay.textContent = state.companion.autoIncome.amount;
-            companionSection.costTime.textContent = state.costs.companionTime;
-            companionSection.costAmount.textContent = state.costs.companionAmount;
-            if (state.levels.companionTime >= 10) {
-                companionSection.upgradeCompanionTimeBtn.disabled = true;
-                companionSection.upgradeCompanionTimeBtn.textContent = "최대 레벨";
-                companionSection.companionTimeUpgradeSpan.textContent = "동료 속도 (최대)";
+        costAutoAmount.textContent = formatNumber(state.costs.autoAmount);
+        currentAutoAmount.textContent = formatNumber(state.autoIncome.amount);
+        costManualAmount.textContent = formatNumber(state.costs.manualAmount);
+        currentManualAmount.textContent = formatNumber(state.manualIncome.amount);
+        let totalCompanionIncomePerSecond = 0;
+        let hasCompanions = false;
+        state.companions.forEach(c => {
+            if (c.acquired) {
+                totalCompanionIncomePerSecond += c.autoIncome.amount / (c.autoIncome.interval / 1000);
+                hasCompanions = true;
             }
+        });
+        if (hasCompanions) {
+            companionTotalIncomeDisplay.style.display = 'block';
+            companionTotalIncomeDisplay.querySelector('span').textContent = formatNumber(totalCompanionIncomePerSecond);
         } else {
-            companionSection.acquireBtn.textContent = `강아지 영입하기 (비용: ${state.costs.acquireCompanion}원)`;
+            companionTotalIncomeDisplay.style.display = 'none';
         }
+        renderCompanions();
     }
-
-    // 5. 수동 수익 처리 함수 (earnMoney 호출로 변경)
-    function handleManualIncome() {
+    function handleManualIncome() { /* ... */ 
         if (state.manualIncome.canEarn) {
             state.manualIncome.canEarn = false;
-            earnMoney(state.manualIncome.amount); // earnMoney를 통해 돈과 경험치를 동시에 획득
-
-            setTimeout(() => {
-                state.manualIncome.canEarn = true;
-                updateUI(); // 아이콘 상태만 변경하기 위해 호출
-            }, 3000);
+            earnMoney(state.manualIncome.amount);
+            setTimeout(() => { state.manualIncome.canEarn = true; updateUI(); }, 3000);
         }
     }
-
-    // 6. 자동 수익 설정 함수 (earnMoney 호출로 변경)
-    function setupAutoIncome() {
-        if (mainAutoIncomeInterval) clearInterval(mainAutoIncomeInterval);
-        mainAutoIncomeInterval = setInterval(() => {
-            earnMoney(state.autoIncome.amount);
-        }, state.autoIncome.interval);
-    }
-
-    function setupCompanionAutoIncome() {
-        if (companionAutoIncomeInterval) clearInterval(companionAutoIncomeInterval);
-        if (state.companion.acquired) {
-            companionAutoIncomeInterval = setInterval(() => {
-                earnMoney(state.companion.autoIncome.amount);
-            }, state.companion.autoIncome.interval);
-        }
-    }
-
-    // 7. 이벤트 리스너 (기존과 거의 동일, 비용 지불 로직만 수정)
-    function addEventListeners() {
-        // 돈을 '사용'하는 부분은 earnMoney를 호출하지 않음
-        function spendMoney(cost) {
-            state.money -= cost;
-            updateUI();
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) handleManualIncome();
+    function setupAllAutoIncomes() { /* ... */ 
+        if (autoIncomeIntervals[0]) clearInterval(autoIncomeIntervals[0]);
+        autoIncomeIntervals[0] = setInterval(() => earnMoney(state.autoIncome.amount), state.autoIncome.interval);
+        state.companions.forEach((companion, index) => {
+            if (autoIncomeIntervals[index + 1]) clearInterval(autoIncomeIntervals[index + 1]);
+            if (companion.acquired) {
+                autoIncomeIntervals[index + 1] = setInterval(() => earnMoney(companion.autoIncome.amount), companion.autoIncome.interval);
+            }
         });
+    }
+    function addEventListeners() { /* ... */ 
+        function spendMoney(cost) { state.money -= cost; updateUI(); }
+        document.addEventListener('keydown', (e) => { if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) handleManualIncome(); });
         beggarImage.addEventListener('click', handleManualIncome);
-
         document.getElementById('upgrade-auto-time').addEventListener('click', () => {
             if (state.money >= state.costs.autoTime && state.autoIncome.interval > 5000) {
                 spendMoney(state.costs.autoTime);
                 state.autoIncome.interval -= 10;
                 state.levels.autoTime++;
                 state.costs.autoTime = 10 + (state.levels.autoTime * 8);
-                setupAutoIncome();
-                updateUI();
+                setupAllAutoIncomes(); updateUI();
             }
         });
-
         document.getElementById('upgrade-auto-amount').addEventListener('click', () => {
-            if (state.money >= state.costs.autoAmount) {
+            if (state.money >= state.costs.autoAmount && state.levels.autoAmount < state.maxLevels.autoAmount) {
                 spendMoney(state.costs.autoAmount);
-                state.autoIncome.amount += 1;
+                state.autoIncome.amount += 1 + Math.floor(state.levels.autoAmount / 10);
                 state.levels.autoAmount++;
-                state.costs.autoAmount = 50 + Math.floor(Math.pow(state.levels.autoAmount, 1.8) * 20);
+                state.costs.autoAmount = 50 + Math.floor(Math.pow(state.levels.autoAmount, 2.2));
                 updateUI();
             }
         });
-
-        // (이하 다른 업그레이드 버튼들도 spendMoney 로직으로 동일하게 적용)
         document.getElementById('upgrade-manual-amount').addEventListener('click', () => {
-            if (state.money >= state.costs.manualAmount) {
+            if (state.money >= state.costs.manualAmount && state.levels.manualAmount < state.maxLevels.manualAmount) {
                 spendMoney(state.costs.manualAmount);
-                state.manualIncome.amount += 1;
+                state.manualIncome.amount += 1 + Math.floor(state.levels.manualAmount / 10);
                 state.levels.manualAmount++;
-                state.costs.manualAmount = 20 + Math.floor(Math.pow(state.levels.manualAmount, 1.9) * 15);
+                state.costs.manualAmount = 20 + Math.floor(Math.pow(state.levels.manualAmount, 2.3));
                 updateUI();
-            }
-        });
-
-        companionSection.acquireBtn.addEventListener('click', () => {
-            if (state.money >= state.costs.acquireCompanion && !state.companion.acquired) {
-                spendMoney(state.costs.acquireCompanion);
-                state.companion.acquired = true;
-                setupCompanionAutoIncome();
-                updateUI();
-            }
-        });
-
-        companionSection.upgradeCompanionTimeBtn.addEventListener('click', () => {
-             if (state.money >= state.costs.companionTime && state.levels.companionTime < 10) {
-                spendMoney(state.costs.companionTime);
-                state.companion.autoIncome.interval -= 1000;
-                state.levels.companionTime++;
-                state.costs.companionTime = 500 * Math.pow(3, state.levels.companionTime);
-                setupCompanionAutoIncome();
-                updateUI();
-            }
-        });
-
-        document.getElementById('upgrade-companion-amount').addEventListener('click', () => {
-             if (state.money >= state.costs.companionAmount) {
-                spendMoney(state.costs.companionAmount);
-                state.companion.autoIncome.amount += 1;
-                state.levels.companionAmount++;
-                state.costs.companionAmount = 1000 + Math.floor(Math.pow(state.levels.companionAmount, 1.8) * 40);
-                updateUI();
-            }
-        });
-
-        companionSection.nameInput.addEventListener('change', () => { state.companion.name = companionSection.nameInput.value; });
-        companionSection.imageUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => { companionSection.image.src = e.target.result; }
-                reader.readAsDataURL(file);
             }
         });
     }
+    function renderCompanions() { /* ... */ 
+        companionsContainer.innerHTML = '<h3>동료</h3>';
+        let previousCompanionAcquired = true;
+        state.companions.forEach((companion, index) => {
+            const card = document.createElement('div');
+            card.className = 'companion-card';
+            if (companion.acquired) {
+                card.innerHTML = `
+                    <div class="has-companion">
+                        <div class="character-box small">
+                            <img src="images/dog.png" alt="${companion.name}" />
+                            <p>${companion.name} (LV.${companion.level})</p>
+                        </div>
+                        <div class="companion-status">
+                            <p>자동수익: ${(companion.autoIncome.interval/1000).toFixed(2)}초 마다 ${formatNumber(companion.autoIncome.amount)}원</p>
+                            <div class="upgrade-item">
+                                <span>속도 향상 (-1.00초)</span>
+                                <div class="upgrade-details">
+                                    <small>비용: ${formatNumber(companion.costs.time)}원</small>
+                                    <button data-index="${index}" data-type="time">구매</button>
+                                </div>
+                            </div>
+                            <div class="upgrade-item">
+                                <span>수익 증가</span>
+                                <div class="upgrade-details">
+                                    <small>비용: ${formatNumber(companion.costs.amount)}원</small>
+                                    <button data-index="${index}" data-type="amount">구매</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            } else if (previousCompanionAcquired) {
+                card.classList.add('locked');
+                card.innerHTML = `<button data-index="${index}" data-type="acquire">${companion.name} 영입하기 (비용: ${formatNumber(companion.cost)}원)</button>`;
+                previousCompanionAcquired = false;
+            }
+            companionsContainer.appendChild(card);
+        });
+        companionsContainer.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', handleCompanionAction);
+        });
+    }
+    function handleCompanionAction(event) { /* ... */ 
+        const { index, type } = event.target.dataset;
+        const companion = state.companions[index];
+        if (!companion) return;
+        if (type === 'acquire') {
+            if (state.money >= companion.cost) {
+                state.money -= companion.cost;
+                companion.acquired = true;
+                setupAllAutoIncomes(); updateUI();
+            }
+        } else if (type === 'time') {
+            if (state.money >= companion.costs.time && companion.levels.time < companion.maxLevel.time) {
+                state.money -= companion.costs.time;
+                companion.autoIncome.interval -= 1000;
+                companion.levels.time++;
+                companion.costs.time *= 3.5;
+                setupAllAutoIncomes(); updateUI();
+            }
+        } else if (type === 'amount') {
+            if (state.money >= companion.costs.amount && companion.levels.amount < companion.maxLevel.amount) {
+                state.money -= companion.costs.amount;
+                if (parseInt(index) === 6 && companion.levels.amount >= 199) {
+                     companion.autoIncome.amount += 400 - companion.autoIncome.amount;
+                } else {
+                     companion.autoIncome.amount += 1 + Math.floor(companion.levels.amount * (index + 1) * 0.5);
+                }
+                companion.levels.amount++;
+                companion.level++;
+                companion.costs.amount += Math.floor(Math.pow(companion.levels.amount, 2.0 + index * 0.1));
+                updateUI();
+            }
+        }
+    }
 
-    // 8. 게임 초기화
     function init() {
         state.expForNextLevel = calculateTotalExpForLevel(state.level + 1);
-        setupAutoIncome();
+        setupAllAutoIncomes();
         addEventListeners();
-        updateUI(); // 게임 시작 시 UI를 한번 그려줌
+        updateUI();
     }
-
-    init();
 });

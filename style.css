@@ -1,3 +1,43 @@
+/* 시작 화면 스타일 */
+#start-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #e9eef2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#start-screen h1 {
+    font-size: 3em;
+    color: #2c3e50;
+}
+
+.start-buttons button {
+    font-size: 1.5em;
+    padding: 15px 30px;
+    margin: 10px;
+    border-width: 2px;
+}
+
+/* 게임 내 저장 버튼 스타일 */
+#save-game-btn {
+    align-self: center;
+    background-color: #2ecc71;
+    border-color: #2ecc71;
+    padding: 8px 16px;
+}
+#save-game-btn:hover {
+    background-color: #27ae60;
+}
+
+/* 시작 화면 끝 */
+
 /* 기본 & 레이아웃 */
 body {
     font-family: 'Malgun Gothic', sans-serif;
@@ -161,6 +201,32 @@ h3 {
 }
 .companion-status {
     flex: 1;
+}
+
+/* 다중 동료 시스템 스타일 */
+#companions-container {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.companion-card {
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.companion-card.locked {
+    text-align: center;
+}
+
+.companion-card .has-companion {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 /* 버튼 및 입력 요소 */

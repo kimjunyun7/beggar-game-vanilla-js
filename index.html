@@ -7,12 +7,22 @@
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-        <div id="game-container">
+        <div id="start-screen">
+            <h1>거지 키우기</h1>
+            <div class="start-buttons">
+                <button id="new-game-btn">새로하기</button>
+                <button id="load-game-btn">불러오기</button>
+                <input type="file" id="load-file-input" accept=".txt" style="display: none;" />
+            </div>
+        </div>
+
+        <div id="game-container" style="display: none;">
             <div id="header">
                 <h1>거지 키우기</h1>
                 <div class="money-box">
                     <h2>총 자산: <span id="money-display">0</span> 원</h2>
                 </div>
+                <button id="save-game-btn">저장하기</button>
             </div>
 
             <div id="main-layout">
@@ -42,6 +52,9 @@
                             <span id="manual-income-status-icon"></span>
                             수동수익: 클릭 또는 방향키 입력 시
                             <span id="manual-income-amount-display">1</span>원
+                        </p>
+                        <p id="companion-total-income-display" style="display: none;">
+                            동료 총수익: 초당 약 <span>0</span>원
                         </p>
                     </div>
                 </div>
@@ -88,71 +101,9 @@
                             </div>
                         </div>
                     </div>
-
-                    <div id="companion-section">
+                    
+                    <div id="companions-container">
                         <h3>동료</h3>
-                        <div id="no-companion">
-                            <button id="acquire-companion">
-                                강아지 영입하기 (비용: 1000원)
-                            </button>
-                        </div>
-                        <div id="has-companion" style="display: none">
-                            <div class="character-box small">
-                                <img
-                                    src="images/dog.png"
-                                    id="companion-image"
-                                    alt="동료"
-                                />
-                                <input
-                                    type="text"
-                                    id="companion-name-input"
-                                    value="멍멍이"
-                                />
-                                <label
-                                    for="companion-image-upload"
-                                    class="image-upload-label"
-                                    >이미지 변경</label
-                                >
-                                <input
-                                    type="file"
-                                    id="companion-image-upload"
-                                    accept="image/*"
-                                    style="display: none"
-                                />
-                            </div>
-                            <div class="companion-status">
-                                <p>
-                                    자동수익:
-                                    <span id="companion-income-interval-display"
-                                        >20.00</span
-                                    >초 마다
-                                    <span id="companion-income-amount-display"
-                                        >1</span
-                                    >원
-                                </p>
-                                <div class="upgrade-item" id="upgrade-companion-time-item">
-                                    <span>동료 속도 향상 (-1.00초)</span>
-                                    <div class="upgrade-details">
-                                        <small>비용: <span id="cost-companion-time">500</span>원</small>
-                                        <button id="upgrade-companion-time">구매</button>
-                                    </div>
-                                </div>
-                                <div class="upgrade-item">
-                                    <span>동료 수익 증가 (+1원)</span>
-                                    <div class="upgrade-details">
-                                        <small
-                                            >비용:
-                                            <span id="cost-companion-amount"
-                                                >1000</span
-                                            >원</small
-                                        >
-                                        <button id="upgrade-companion-amount">
-                                            구매
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
